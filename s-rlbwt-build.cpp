@@ -12,7 +12,7 @@ int sa_rate = 512;
 void help(){
 	cout << "s-rlbwt-build" << endl << endl;
 	cout << "Usage: s-rlbwt-build [options] <input_file_name>" << endl;
-	cout << "   -o <basename>         use 'basename' as prefix for all index files. Default: basename is the specified input_file_name"<<endl<<endl;
+	cout << "   -o <basename>         use 'basename' as prefix for all index files. Default: basename is the specified input_file_name"<<endl;
 	cout << "   -sr                   suffix array sampling rate. Default = 512." << endl;
 	cout << "   <input_file_name>     input text file." << endl;
 	exit(0);
@@ -35,7 +35,7 @@ void parse_args(char** argv, int argc, int &ptr){
 		out_basename = string(argv[ptr]);
 		ptr++;
 
-	}if(s.compare("-sr")==0){
+	}else if(s.compare("-sr")==0){
 
 		if(ptr>=argc-1){
 			cout << "Error: missing parameter after -sr option." << endl;
