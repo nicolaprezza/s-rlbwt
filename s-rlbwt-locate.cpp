@@ -7,7 +7,8 @@ using namespace std;
 
 void help(){
 	cout << "s-rlbwt-locate: locate all occurrences of the input patterns. Note that this program" << endl;
-	cout << "discards the output (i.e. text positions), and should be used only for benchmark purposes." << endl << endl;
+	cout << "discards the output (i.e. text positions), and should be used only for benchmark purposes." << endl;
+	cout <<	"NOTE moreover that suffix .srlbwt is automatically added to input index file" << endl << endl;
 	cout << "Usage: s-rlbwt-locate <index_basename> <patterns_file>" << endl;
 	cout << "   <index_basename>    basename of all index files" << endl;
 	cout << "   <patterns_file>     file in pizza&chili format containing the patterns." << endl;
@@ -68,6 +69,7 @@ void search(string idx_basename, string patterns, bool optimize = true){
 
 		//cout << "done." << endl;
 
+		//cout << "OCC = ";
 		//for(auto o:occ) cout << o << " ";
 		//cout << endl;
 

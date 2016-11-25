@@ -56,10 +56,14 @@ public:
 
 		ulint log2n = bitsize(uint64_t(bwt.size()));
 
+		assert(log2n>0);
+
 		//mark sampled BWT positions
 
 		auto n = bwt.size();
 		ulint sa_samples = n/sr + (n%sr != 0);
+
+		assert(sa_samples>0);
 
 		{
 
@@ -81,11 +85,15 @@ public:
 
 			}
 
+			assert(text_pos==0);
+
 			//here text_pos=0
 			sampled_BWT_pos_bools[bwt_pos] = true;
 
 			//convert to gap-encoded vector
 			sampled_BWT_pos = sparse_sd_vector<>(sampled_BWT_pos_bools);
+
+			assert(sampled_BWT_pos.rank(sampled_BWT_pos.size())==sa_samples);
 
 		}
 
@@ -306,7 +314,8 @@ public:
 	ulint locate_L(ulint L_pos){
 
 		if(sampled_BWT_pos[L_pos]) return SA[sampled_BWT_pos.rank(L_pos)];
-		return 1 + locate(LF(L_pos));
+
+		return 1 + locate_L(LF(L_pos));
 
 	}
 
@@ -348,6 +357,15 @@ public:
 
 		w_bytes += bwt.serialize(out);
 
+
+		out.write((char*)&sr,sizeof(ulint));
+		w_bytes += sizeof(sr);
+
+		w_bytes += SA.serialize(out);
+
+		//marks sampled BWT positions
+		w_bytes += sampled_BWT_pos.serialize(out);
+
 		return w_bytes;
 
 	}
@@ -364,6 +382,12 @@ public:
 
 		bwt.load(in);
 
+		in.read((char*)&sr,sizeof(ulint));
+
+		SA.load(in);
+
+		sampled_BWT_pos.load(in);
+
 	}
 
 	/*
@@ -372,7 +396,7 @@ public:
 	 */
 	void save_to_file(string path_prefix){
 
-		string path = string(path_prefix).append(".rlbwt");
+		string path = string(path_prefix).append(".srlbwt");
 
 		std::ofstream out(path);
 		serialize(out);
@@ -386,7 +410,7 @@ public:
 	 */
 	void load_from_file(string path_prefix){
 
-		string path = string(path_prefix).append(".rlbwt");
+		string path = string(path_prefix).append(".srlbwt");
 		std::ifstream in(path);
 		load(in);
 		in.close();

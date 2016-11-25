@@ -10,7 +10,7 @@ string input_file=string();
 int sa_rate = 512;
 
 void help(){
-	cout << "s-rlbwt-build" << endl << endl;
+	cout << "s-rlbwt-build: builds s-rlbwt index. NOTE: suffix .srlbwt is automatically added to output file" << endl << endl;
 	cout << "Usage: s-rlbwt-build [options] <input_file_name>" << endl;
 	cout << "   -o <basename>         use 'basename' as prefix for all index files. Default: basename is the specified input_file_name"<<endl;
 	cout << "   -sr                   suffix array sampling rate. Default = 512." << endl;

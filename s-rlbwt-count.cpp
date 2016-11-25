@@ -7,7 +7,9 @@ using namespace std;
 
 void help(){
 	cout << "s-rlbwt-count: count number of occurrences of the input patterns. Note that this program" << endl;
-	cout << "discards the output (i.e. number of pattern occurrences), and should be used only for benchmark purposes." << endl << endl;
+	cout << "discards the output (i.e. number of pattern occurrences), and should be used only for benchmark purposes." << endl;
+	cout <<	"NOTE moreover that suffix .srlbwt is automatically added to input index file" << endl << endl;
+
 	cout << "Usage: s-rlbwt-count <index_basename> <patterns_file>" << endl;
 	cout << "   <index_basename>    basename of all index files" << endl;
 	cout << "   <patterns_file>     file in pizza&chili format containing the patterns." << endl;
