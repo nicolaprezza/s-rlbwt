@@ -25,26 +25,99 @@ public:
 	s_rlbwt(string &input, ulint sa_rate = 512){
 
 		assert(not contains_reserved_chars(input));
-		string bwt_s = build_bwt(input);
+		assert(sa_rate>0);
 
-		bwt = rle_string_t(bwt_s);
+		sr = sa_rate;
 
-		//build F column
-		F = vector<ulint>(256,0);
-		for(uchar c : bwt_s)
-			F[c]++;
+		//build run-length encoded BWT
+		{
 
-		for(ulint i=255;i>0;--i)
-			F[i] = F[i-1];
+			string bwt_s = build_bwt(input);
+			bwt = rle_string_t(bwt_s);
 
-		F[0] = 0;
+			//build F column
+			F = vector<ulint>(256,0);
+			for(uchar c : bwt_s)
+				F[c]++;
 
-		for(ulint i=1;i<256;++i)
-			F[i] += F[i-1];
+			for(ulint i=255;i>0;--i)
+				F[i] = F[i-1];
 
-		for(ulint i=0;i<bwt_s.size();++i)
-			if(bwt_s[i]==TERMINATOR)
-				terminator_position = i;
+			F[0] = 0;
+
+			for(ulint i=1;i<256;++i)
+				F[i] += F[i-1];
+
+			for(ulint i=0;i<bwt_s.size();++i)
+				if(bwt_s[i]==TERMINATOR)
+					terminator_position = i;
+
+		}
+
+		ulint log2n = bitsize(uint64_t(bwt.size()));
+
+		//mark sampled BWT positions
+
+		auto n = bwt.size();
+		ulint sa_samples = n/sr + (n%sr != 0);
+
+		{
+
+			vector<bool> sampled_BWT_pos_bools(bwt.size(),false);
+
+			//position corresponding to last character
+			ulint bwt_pos = terminator_position;
+			ulint text_pos = bwt.size()-1;
+
+			//now backward-navigate BWT
+
+			while(text_pos>0){
+
+				if(text_pos % sr == 0)
+					sampled_BWT_pos_bools[bwt_pos] = true;
+
+				bwt_pos = LF(bwt_pos);
+				text_pos--;
+
+			}
+
+			//here text_pos=0
+			sampled_BWT_pos_bools[bwt_pos] = true;
+
+			//convert to gap-encoded vector
+			sampled_BWT_pos = sparse_sd_vector<>(sampled_BWT_pos_bools);
+
+		}
+
+		//build and populate SA sampling
+		{
+
+			SA = int_vector<>(sa_samples,0,log2n);
+
+			//position corresponding to last character
+			ulint bwt_pos = terminator_position;
+			ulint text_pos = bwt.size()-1;
+
+			//now backward-navigate BWT
+
+			while(text_pos>0){
+
+				if(text_pos % sr == 0){
+
+					SA[ sampled_BWT_pos.rank(bwt_pos) ] = text_pos;
+
+				}
+
+				bwt_pos = LF(bwt_pos);
+				text_pos--;
+
+			}
+
+			//here text_pos=0
+			SA[ sampled_BWT_pos.rank(bwt_pos) ] = text_pos;
+
+		}
+
 
 	}
 
@@ -196,6 +269,48 @@ public:
 	}
 
 	/*
+	 * locate F position i, i.e. return i-th suffix array entry
+	 */
+	ulint locate(ulint F_pos){
+
+		return locate_L(FL(F_pos));
+
+	}
+
+	/*
+	 * locate all occurrences in the inclusive BWT range
+	 */
+	vector<ulint> locate(range_t bwt_range){
+
+		vector<ulint> occ;
+
+		for(ulint f_pos = bwt_range.first; f_pos <= bwt_range.second; ++f_pos)
+			occ.push_back(locate(f_pos));
+
+		return occ;
+
+	}
+
+	/*
+	 * locate all occurrences of pattern P
+	 */
+	vector<ulint> locate(string &P){
+
+		return locate(count(P));
+
+	}
+
+	/*
+	 * locate L position i (i.e. i is on the BWT)
+	 */
+	ulint locate_L(ulint L_pos){
+
+		if(sampled_BWT_pos[L_pos]) return SA[sampled_BWT_pos.rank(L_pos)];
+		return 1 + locate(LF(L_pos));
+
+	}
+
+	/*
 	 * get number of runs in the BWT (terminator character included)
 	 */
 	ulint number_of_runs(){
@@ -298,6 +413,13 @@ public:
 
 private:
 
+	uint8_t bitsize(uint64_t x){
+
+		if(x==0) return 1;
+		return 64 - __builtin_clzll(x);
+
+	}
+
 	/*
 	 * check if range rn on column F contains a
 	 * single character
@@ -385,8 +507,17 @@ private:
 
 	ulint terminator_position = 0;
 
-	//F column of the BWT
+	//F column of the BWT (vector of 256 elements)
 	vector<ulint> F;
+
+	//sample rate
+	ulint sr = 0;
+
+	//suffix array sampling
+	int_vector<> SA;
+
+	//marks sampled BWT positions
+	sparse_sd_vector<> sampled_BWT_pos;
 
 };
 

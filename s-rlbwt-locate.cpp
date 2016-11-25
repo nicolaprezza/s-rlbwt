@@ -63,9 +63,8 @@ void search(string idx_basename, string patterns, bool optimize = true){
 
 		//cout << "locating " << idx.count(p) << " occurrences of "<< p << " ... " << flush;
 
-		//auto occ = idx.locate(p, optimize);	//occurrences
-
-		//occ_tot+=occ.size();
+		auto occ = idx.locate(p);	//occurrences
+		occ_tot+=occ.size();
 
 		//cout << "done." << endl;
 

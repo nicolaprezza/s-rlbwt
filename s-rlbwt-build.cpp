@@ -44,8 +44,8 @@ void parse_args(char** argv, int argc, int &ptr){
 
 		sa_rate = atoi(argv[ptr]);
 
-		if(sa_rate < 0){
-			cout << "Error: sampling rate must be non-negative" << endl;
+		if(sa_rate <= 0){
+			cout << "Error: sampling rate must be > 0" << endl;
 			help();
 		}
 
