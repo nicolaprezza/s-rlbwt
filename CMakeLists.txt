@@ -38,3 +38,8 @@ add_executable(s-rlbwt-count s-rlbwt-count.cpp)
 TARGET_LINK_LIBRARIES(s-rlbwt-count sdsl)
 TARGET_LINK_LIBRARIES(s-rlbwt-count divsufsort)
 TARGET_LINK_LIBRARIES(s-rlbwt-count divsufsort64)
+
+add_executable(s-rlbwt-space s-rlbwt-space.cpp)
+TARGET_LINK_LIBRARIES(s-rlbwt-space sdsl)
+TARGET_LINK_LIBRARIES(s-rlbwt-space divsufsort)
+TARGET_LINK_LIBRARIES(s-rlbwt-space divsufsort64)

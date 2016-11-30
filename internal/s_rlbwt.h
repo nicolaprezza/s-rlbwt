@@ -435,6 +435,39 @@ public:
 		return string(".rlbwt");
 	}
 
+	ulint print_space(){
+
+		cout << "Number of runs = " << bwt.number_of_runs() << endl<<endl;
+
+		ulint tot_bytes = bwt.print_space();
+
+		cout << "\nTOT BWT space: " << tot_bytes << " Bytes" <<endl<<endl;
+
+
+		{
+			std::ofstream out("/dev/null");
+			auto bytesize = SA.serialize(out);
+
+			tot_bytes += bytesize;
+
+			cout << "SA sampling: " << bytesize << " Bytes" <<endl;
+
+		}
+
+		{
+			std::ofstream out("/dev/null");
+			auto bytesize = sampled_BWT_pos.serialize(out);
+
+			tot_bytes += bytesize;
+
+			cout << "marked sampled positions: " << bytesize << " Bytes" <<endl;
+
+		}
+
+		return tot_bytes;
+
+	}
+
 private:
 
 	uint8_t bitsize(uint64_t x){
