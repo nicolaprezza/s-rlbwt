@@ -443,11 +443,13 @@ public:
 
 		cout << "\nTOT BWT space: " << tot_bytes << " Bytes" <<endl<<endl;
 
+		ulint sa_space = 0;
 
 		{
 			std::ofstream out("/dev/null");
 			auto bytesize = SA.serialize(out);
 
+			sa_space += bytesize;
 			tot_bytes += bytesize;
 
 			cout << "SA sampling: " << bytesize << " Bytes" <<endl;
@@ -458,11 +460,15 @@ public:
 			std::ofstream out("/dev/null");
 			auto bytesize = sampled_BWT_pos.serialize(out);
 
+			sa_space += bytesize;
 			tot_bytes += bytesize;
 
 			cout << "marked sampled positions: " << bytesize << " Bytes" <<endl;
 
 		}
+
+		cout << "\nTOT SA sampling space: " << sa_space << " Bytes" <<endl<<endl;
+
 
 		return tot_bytes;
 
